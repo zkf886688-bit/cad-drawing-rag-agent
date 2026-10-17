@@ -58,7 +58,7 @@ TOOL_SCHEMAS: dict[str, type[BaseModel]] = {
 
 
 def tool_catalog() -> list[dict[str, Any]]:
-    """JSON-serialisable tool list for /tools and答辩材料."""
+    """JSON-serialisable tool definitions for the /tools endpoint."""
     return [
         {
             "name": name,

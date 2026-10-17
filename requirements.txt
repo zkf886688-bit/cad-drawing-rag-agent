@@ -10,6 +10,6 @@ python-multipart>=0.0.9
 jsonschema>=4.20.0
 numpy>=1.26.0
 scikit-learn>=1.4.0
-# 需求 5：中文嵌入检索（bge-small-zh-v1.5）
+# 中文嵌入检索（bge-small-zh-v1.5）
 sentence-transformers>=3.0.0
 torch>=2.0.0

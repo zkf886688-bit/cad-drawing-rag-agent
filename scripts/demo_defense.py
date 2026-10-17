@@ -1,6 +1,6 @@
-"""答辩 Demo：固定 5 类问题（单图 / 全库 / 标准 / 多轮 / 上传说明）。
+"""问答示例：固定 5 类问题（单图 / 全库 / 标准 / 多轮 / 上传说明）。
 
-离线可跑（默认 extractive + bm25），用于演示与截图：
+使用 extractive + bm25 运行固定问答场景：
 
   set CAD_GENERATE=extractive
   py scripts/demo_defense.py
@@ -59,10 +59,10 @@ UPLOAD_TIP = """上传演示（浏览器）：
   1. 打开 http://127.0.0.1:8000/ui
   2. 点击附件，选择 datasets/raw 下任一张 .dxf（或自备 DWG）
   3. 发送任意一句（如「这张图有哪些图层」），等待入库完成
-  4. 截图：入库状态条 + 回答依据栏预览
+  4. 查看入库状态、回答依据和图纸预览
 
 命令行等价：POST /upload → 轮询 /ingest/{job_id} → POST /chat
-详见 README「加入新图纸」
+详见 README「图纸入库」
 """
 
 
@@ -75,7 +75,7 @@ def run_scenarios(*, write_transcript: Path | None) -> int:
     rag = CadRAG(generate="extractive")
     state = SessionState()
     lines: list[str] = [
-        "# 答辩 Demo 问答摘要",
+        "# 问答示例 问答摘要",
         "",
         "由 `py scripts/demo_defense.py --write-transcript` 生成；默认 extractive，不含 API 密钥。",
         "",
@@ -83,7 +83,7 @@ def run_scenarios(*, write_transcript: Path | None) -> int:
     failed = 0
 
     print("=" * 56)
-    print("CAD 知识库 · 答辩 Demo（extractive / bm25）")
+    print("CAD 知识库 · 问答示例（extractive / bm25）")
     print("=" * 56)
 
     for title, questions, expect in SCENARIOS:

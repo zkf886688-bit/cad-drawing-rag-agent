@@ -614,7 +614,7 @@ class CadRAG:
                 if chunk.get("drawing") == identified and chunk.get("kind") in overview
             ][:4]
 
-        # 只读工具（Pydantic 校验）增强证据，便于答辩展示 Tool 闭环
+        # 调用经 Pydantic 校验的只读工具，补充检索依据
         tools_used: list[str] = []
         use_tools = os.environ.get("CAD_TOOLS", "1").strip().lower() not in {
             "0",
