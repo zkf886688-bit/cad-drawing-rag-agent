@@ -1,0 +1,15 @@
+ezdxf>=1.3.0
+matplotlib>=3.8.0
+pillow>=10.0.0
+# RapidOCR 尚不支持 Python 3.14，OCR 那一步需用 py -3.13 运行
+rapidocr>=3.0.0
+onnxruntime>=1.17.0
+fastapi>=0.110.0
+uvicorn>=0.27.0
+python-multipart>=0.0.9
+jsonschema>=4.20.0
+numpy>=1.26.0
+scikit-learn>=1.4.0
+# 需求 5：中文嵌入检索（bge-small-zh-v1.5）
+sentence-transformers>=3.0.0
+torch>=2.0.0

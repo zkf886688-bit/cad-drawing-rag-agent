@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CADMergedRecord",
+  "description": "Stage-2 output of scripts/merge_ocr.py: vector JSON + OCR readings with drawing-space positions and optional vector links.",
+  "type": "object",
+  "required": ["file_name", "stats", "vector_texts", "ocr_texts", "sources"],
+  "properties": {
+    "file_name": { "type": "string" },
+    "dxf_version": { "type": ["string", "null"] },
+    "header": { "type": "object" },
+    "stats": {
+      "type": "object",
+      "required": [
+        "vector_text_count",
+        "ocr_text_count",
+        "linked_text_count",
+        "linked_by_rule"
+      ],
+      "properties": {
+        "vector_text_count": { "type": "integer", "minimum": 0 },
+        "ocr_text_count": { "type": "integer", "minimum": 0 },
+        "linked_text_count": { "type": "integer", "minimum": 0 },
+        "linked_by_rule": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "ocr_class_counts": { "type": "object" }
+      }
+    },
+    "vector_texts": { "type": "array" },
+    "ocr_texts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["content", "text_class"],
+        "properties": {
+          "content": { "type": "string" },
+          "text_class": {
+            "type": "string",
+            "enum": ["spec", "single_char", "other", "empty"]
+          },
+          "drawing_position": { "type": ["array", "null"] },
+          "space": { "type": "string" },
+          "link": { "type": ["object", "null"] }
+        }
+      }
+    },
+    "sources": { "type": "object" }
+  },
+  "additionalProperties": true
+}

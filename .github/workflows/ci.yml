@@ -1,0 +1,19 @@
+name: Public demo
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  offline-demo:
+    runs-on: ubuntu-latest
+    env:
+      CAD_GENERATE: extractive
+      CAD_RAG_BACKEND: bm25
+      CAD_VLM_MODE: heuristic
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: python -m pip install -r requirements-demo.txt
+      - run: python scripts/prepare_public_demo.py
+      - run: python scripts/check_public_demo.py

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CADVlmRecord",
+  "description": "Stage-3 output of scripts/vlm_understand.py (heuristic / qwen).",
+  "type": "object",
+  "required": [
+    "file_name",
+    "mode",
+    "drawing_type",
+    "summary",
+    "main_objects",
+    "spatial_relations",
+    "ocr_hard_notes",
+    "risks"
+  ],
+  "properties": {
+    "file_name": { "type": "string" },
+    "mode": {
+      "type": "string",
+      "enum": ["heuristic", "qwen"]
+    },
+    "model": { "type": "string" },
+    "drawing_type": { "type": "string" },
+    "summary": { "type": "string" },
+    "main_objects": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "spatial_relations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "ocr_hard_notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "risks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "latency_seconds": { "type": "number" },
+    "evidence": { "type": "object" }
+  },
+  "additionalProperties": true
+}

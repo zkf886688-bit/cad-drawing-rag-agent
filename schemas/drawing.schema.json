@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CADDrawing",
+  "description": "Stage-1 output of scripts/parse_dxf.py: one structured record per DXF file. Validated by scripts/validate_json.py.",
+  "type": "object",
+  "required": [
+    "file_name",
+    "dxf_version",
+    "header",
+    "layers",
+    "blocks",
+    "block_references",
+    "entities",
+    "texts",
+    "dimensions",
+    "tables",
+    "layouts",
+    "stats"
+  ],
+  "properties": {
+    "file_name": { "type": "string" },
+    "dxf_version": { "type": "string" },
+    "header": {
+      "type": "object",
+      "description": "DXF header variables that give the coordinates meaning.",
+      "required": ["insunits_code", "units", "measurement", "ltscale", "extents"],
+      "properties": {
+        "insunits_code": { "type": ["integer", "null"] },
+        "units": { "type": "string" },
+        "measurement": { "type": ["string", "null"], "enum": ["公制", "英制", null] },
+        "ltscale": { "type": "number" },
+        "extents": {
+          "type": ["object", "null"],
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "$ref": "#/$defs/point" },
+            "max": { "$ref": "#/$defs/point" }
+          }
+        }
+      }
+    },
+    "layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "color", "linetype", "frozen", "off", "locked", "plot"],
+        "properties": {
+          "name": { "type": "string" },
+          "color": { "type": "integer" },
+          "linetype": { "type": "string" },
+          "frozen": { "type": "boolean" },
+          "off": { "type": "boolean" },
+          "locked": { "type": "boolean" },
+          "plot": { "type": "boolean" }
+        }
+      }
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "entity_count"],
+        "properties": {
+          "name": { "type": "string" },
+          "entity_count": { "type": "integer", "minimum": 0 },
+          "entity_type_counts": { "type": "object" }
+        }
+      }
+    },
+    "block_references": {
+      "type": "array",
+      "description": "INSERT entities expanded into the geometry they actually draw.",
+      "items": {
+        "type": "object",
+        "required": ["block_name", "insert", "content_types", "content_count"],
+        "properties": {
+          "block_name": { "type": "string" },
+          "layer": { "type": "string" },
+          "insert": { "$ref": "#/$defs/point" },
+          "content_types": {
+            "type": "object",
+            "additionalProperties": { "type": "integer", "minimum": 0 }
+          },
+          "content_count": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entity" }
+    },
+    "texts": {
+      "type": "array",
+      "description": "Model-space TEXT/MTEXT content, the vector-side counterpart of OCR.",
+      "items": { "$ref": "#/$defs/text" }
+    },
+    "dimensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["handle", "layer", "definition_point"],
+        "properties": {
+          "handle": { "type": "string" },
+          "layer": { "type": "string" },
+          "definition_point": { "$ref": "#/$defs/point" },
+          "text": { "type": "string" },
+          "measurement": { "type": "number" }
+        }
+      }
+    },
+    "tables": {
+      "type": "array",
+      "description": "ACAD_TABLE entities. declared_rows/declared_cols are what the file states (often 0); rows_detected is derived from cell coordinates.",
+      "items": {
+        "type": "object",
+        "required": ["insert", "declared_rows", "declared_cols", "rows_detected", "cell_count", "rows"],
+        "properties": {
+          "handle": { "type": "string" },
+          "layer": { "type": "string" },
+          "insert": { "$ref": "#/$defs/point" },
+          "declared_rows": { "type": "integer", "minimum": 0 },
+          "declared_cols": { "type": "integer", "minimum": 0 },
+          "rows_detected": { "type": "integer", "minimum": 0 },
+          "cell_count": { "type": "integer", "minimum": 0 },
+          "rows": {
+            "type": "array",
+            "items": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "layouts": {
+      "type": "array",
+      "description": "Paper-space layouts. Rendering only covers model space, so these entities exist in JSON only.",
+      "items": {
+        "type": "object",
+        "required": ["name", "entity_count", "entities", "texts", "viewports"],
+        "properties": {
+          "name": { "type": "string" },
+          "entity_count": { "type": "integer", "minimum": 0 },
+          "entity_type_counts": { "type": "object" },
+          "entities": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+          "texts": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+          "viewports": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["center", "width", "height", "frozen_layers"],
+              "properties": {
+                "id": { "type": ["integer", "null"] },
+                "layer": { "type": "string" },
+                "center": { "$ref": "#/$defs/point" },
+                "width": { "type": "number" },
+                "height": { "type": "number" },
+                "status": { "type": ["integer", "null"] },
+                "view_center": { "$ref": "#/$defs/point" },
+                "view_height": { "type": "number" },
+                "frozen_layers": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "required": [
+        "entity_count",
+        "layer_count",
+        "block_count",
+        "text_count",
+        "dimension_count",
+        "table_count",
+        "layout_count",
+        "viewport_count",
+        "frozen_layers",
+        "entity_type_counts"
+      ],
+      "properties": {
+        "entity_count": { "type": "integer", "minimum": 0 },
+        "layer_count": { "type": "integer", "minimum": 0 },
+        "block_count": { "type": "integer", "minimum": 0 },
+        "block_reference_count": { "type": "integer", "minimum": 0 },
+        "text_count": { "type": "integer", "minimum": 0 },
+        "dimension_count": { "type": "integer", "minimum": 0 },
+        "table_count": { "type": "integer", "minimum": 0 },
+        "table_cell_count": { "type": "integer", "minimum": 0 },
+        "layout_count": { "type": "integer", "minimum": 0 },
+        "paperspace_entity_count": { "type": "integer", "minimum": 0 },
+        "paperspace_text_count": { "type": "integer", "minimum": 0 },
+        "viewport_count": { "type": "integer", "minimum": 0 },
+        "frozen_layers": { "type": "array", "items": { "type": "string" } },
+        "viewport_frozen_layers": { "type": "array", "items": { "type": "string" } },
+        "entity_type_counts": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 3
+    },
+    "entity": {
+      "type": "object",
+      "required": ["type", "layer", "handle"],
+      "properties": {
+        "type": { "type": "string" },
+        "layer": { "type": "string" },
+        "handle": { "type": "string" },
+        "geometry": { "type": "object" },
+        "attributes": { "type": "object" }
+      }
+    },
+    "text": {
+      "type": "object",
+      "required": ["content", "layer", "position"],
+      "properties": {
+        "content": { "type": "string" },
+        "layer": { "type": "string" },
+        "handle": { "type": "string" },
+        "type": { "type": "string" },
+        "height": { "type": "number" },
+        "rotation": { "type": "number" },
+        "position": { "$ref": "#/$defs/point" }
+      }
+    }
+  }
+}

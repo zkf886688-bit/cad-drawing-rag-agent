@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+tmp/
+# All drawings, extracted content, indexes and conversations stay local.
+datasets/
+*.dwg
+*.dxf
+*.db
+*.db-*
+*.sqlite*
+*.pem
+*.key

@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CADFinalRecord",
+  "description": "Stage-4 output of scripts/build_final.py: the knowledge-base record for one drawing, combining vector structure, OCR readings and visual understanding. Validated by scripts/validate_json.py.",
+  "type": "object",
+  "required": [
+    "file_name",
+    "header",
+    "stats",
+    "layers",
+    "vector_texts",
+    "ocr_texts",
+    "entities",
+    "steel_specs",
+    "vlm",
+    "sources"
+  ],
+  "properties": {
+    "file_name": { "type": "string" },
+    "dxf_version": { "type": "string" },
+    "header": { "type": "object" },
+    "stats": {
+      "type": "object",
+      "required": [
+        "vector_text_count",
+        "ocr_text_count",
+        "linked_text_count",
+        "linked_by_rule",
+        "entity_count",
+        "layer_count"
+      ],
+      "properties": {
+        "vector_text_count": { "type": "integer", "minimum": 0 },
+        "ocr_text_count": { "type": "integer", "minimum": 0 },
+        "linked_text_count": { "type": "integer", "minimum": 0 },
+        "linked_by_rule": {
+          "type": "object",
+          "description": "How many links each rule produced; text+spatial is the stronger of the two.",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "ocr_class_counts": { "type": "object" },
+        "ocr_suspect_count": { "type": "integer", "minimum": 0 },
+        "units": { "type": ["string", "null"] }
+      }
+    },
+    "layers": { "type": "array" },
+    "blocks": { "type": "array" },
+    "block_references": { "type": "array" },
+    "dimensions": { "type": "array" },
+    "tables": { "type": "array" },
+    "layouts": { "type": "array" },
+    "vector_texts": { "type": "array" },
+    "ocr_texts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["content", "text_class"],
+        "properties": {
+          "content": { "type": "string" },
+          "confidence": { "type": ["number", "null"] },
+          "bbox": { "type": "array" },
+          "text_class": {
+            "type": "string",
+            "description": "single_char readings are kept here but excluded from the retrieval index.",
+            "enum": ["spec", "single_char", "other", "empty"]
+          },
+          "model_point": { "type": ["array", "null"] },
+          "link": {
+            "type": ["object", "null"],
+            "required": ["vector_handle", "matched_by"],
+            "properties": {
+              "vector_handle": { "type": "string" },
+              "vector_content": { "type": "string" },
+              "matched_by": { "type": "string", "enum": ["text+spatial", "spatial"] },
+              "distance": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "entities": { "type": "array" },
+    "steel_specs": {
+      "type": "object",
+      "required": ["designations", "designation_count", "member_types"],
+      "properties": {
+        "designations": { "type": "array", "items": { "type": "string" } },
+        "designation_count": { "type": "integer", "minimum": 0 },
+        "member_types": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["prefix", "name"],
+            "properties": {
+              "prefix": { "type": "string" },
+              "name": { "type": "string" },
+              "note": { "type": "string" },
+              "count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "vlm": {
+      "type": "object",
+      "required": ["mode", "drawing_type", "summary"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "description": "heuristic means stage 3 ran rule-based, not as a vision model.",
+          "enum": ["heuristic", "qwen"]
+        },
+        "model": { "type": "string" },
+        "drawing_type": { "type": "string" },
+        "summary": { "type": "string" },
+        "main_objects": { "type": "array" },
+        "spatial_relations": { "type": "array" },
+        "ocr_hard_notes": { "type": "array" },
+        "risks": { "type": "array" }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "description": "Every record points back at the files it came from, so any answer can be traced.",
+      "properties": {
+        "vector_json": { "type": "string" },
+        "ocr_json": { "type": "string" },
+        "image": { "type": "string" },
+        "vlm_json": { "type": "string" }
+      }
+    }
+  }
+}
